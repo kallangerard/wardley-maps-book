@@ -1,0 +1,24 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Ruby 2.6
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.6.x
+      - name: Build ebook with asciidoctor
+        run: |
+          gem install asciidoctor
+          NOKOGIRI_USE_SYSTEM_LIBRARIES=1 gem install --pre asciidoctor-epub3 
+          gem install kindlegen -v 3.0.3
+          asciidoctor-epub3 -a ebook-format=kf8 wardley-maps-book.adoc
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: wardley-maps-book.mobi
+          path: wardley-maps-book.mobi
